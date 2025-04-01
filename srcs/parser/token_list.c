@@ -6,74 +6,65 @@
 /*   By: usoontra <usoontra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/01 12:36:28 by euniceleow        #+#    #+#             */
-/*   Updated: 2025/02/17 12:45:00 by usoontra         ###   ########.fr       */
+/*   Updated: 2025/04/01 20:40:54 by usoontra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-t_tokens	*create_node(const char *token)
+int	screen_space(char c)
 {
-	t_tokens *node;
-	int len = 0;
-
-	while (token[len])
-		len++;
-	node = malloc(sizeof(t_tokens));
-	if (!node)
-		return NULL;
-	node->str = ft_strncpy(token, len);
-	if (!node->str)
-	{
-		free(node);
-		return NULL;
-	}
-	node->status = -1;
-	node->next = NULL;
-	return (node);
+	if (c == ' ' || c == '\t')
+		return (EXIT_FAILURE);
+	return (EXIT_SUCCESS);
 }
 
-void	add_node(t_tokens **list, char *token, int *ctl)
+static int	define_status(char *str, int ctl, int quote)
 {
-	t_tokens *temp;
+	if (!ft_strncmp(str, "|", 2) && !quote)
+		return (PIPE);
+	else if (!quote && (!ft_strncmp(str, "<", 2) || !ft_strncmp(str, ">", 2)))
+		return (REDIRECT);
+	else if (!quote && (!ft_strncmp(str, "<<", 3) || !ft_strncmp(str, ">>", 3)))
+		return (REDIRECT);
+	else if (ctl == 0)
+		return (CMD);
+	else
+		return (CMD_ELEMENT);
+}
 
-	temp  = create_node(token);
+static int	check_status_isredirect(t_tokens **list)
+{
+	t_tokens	*temp;
+
+	if (!*list)
+		return (EXIT_FAILURE);
+	temp = *list;
+	while (temp->next)
+		temp = temp->next;
+	if (temp->status == REDIRECT)
+		return (EXIT_SUCCESS);
+	return (EXIT_FAILURE);
+}
+
+void	add_node(t_tokens **list, char *token, int *ctl, int quote)
+{
+	t_tokens	*temp;
+
+	if (!token)
+		return ;
+	temp = malloc(sizeof(t_tokens));
 	if (!temp)
-		return;
+		return ;
 	temp->str = token;
 	temp->next = NULL;
-	temp->status = define_status(temp->str, *ctl);
-	if (!check_status_isredirect(list) && temp->status != REDIRECT)
+	temp->status = define_status(temp->str, *ctl, quote);
+	if (!check_status_isredirect(list) && \
+			temp->status != REDIRECT && temp->status != PIPE)
 		temp->status = REDIRECT_NAME;
 	if (temp->status == CMD)
 		(*ctl)++;
-	if (temp->status == PIPE && ctl > CMD)
+	if (temp->status == PIPE && *ctl > CMD)
 		(*ctl) = CMD;
 	ft_list_addback((void **)list, temp);
-}
-
-// void print_linked_list(t_tokens *head)
-// {
-//     int i = 0;
-//     printf("Parsed Tokens:\n");
-
-//     while (head)
-//     {
-//         printf("Token %d: %s (Status: %d)\n", i, head->str, head->status);
-//         head = head->next;
-//         i++;
-//     }
-// }
-
-void	free_tokens_list(t_tokens *head)
-{
-	t_tokens *temp;
-
-	while (head)
-	{
-		temp = head;
-		head = head->next;
-		free(temp->str);
-		free(temp);
-	}
 }

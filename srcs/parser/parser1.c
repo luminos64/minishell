@@ -6,84 +6,104 @@
 /*   By: usoontra <usoontra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/01 12:36:40 by euniceleow        #+#    #+#             */
-/*   Updated: 2025/02/17 12:37:53 by usoontra         ###   ########.fr       */
+/*   Updated: 2025/03/05 17:57:32 by usoontra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int	count_tokens(const char *input)
+int	is_operator(char c, int ctl)
 {
-	int i;
-	int word;
+	if (ctl == 0)
+	{
+		if (c == '<' || c == '>' || c == '|')
+			return (1);
+	}
+	else
+	{
+		if (c == '<' || c == '>' || c == '|' || c == '\'' || c == '"')
+			return (1);
+	}
+	return (0);
+}
+
+static char	*extract_operator(const char *input, int *index)
+{
+	int		len;
+	char	*temp;
+
+	len = 1;
+	temp = NULL;
+	if (input[*index + 1] == input[*index])
+		len++;
+	temp = ft_strncpy(&input[*index], len);
+	*index += len;
+	return (temp);
+}
+
+static int	check_quote_pairing(char *str)
+{
+	int		i;
+	int		c;
 
 	i = 0;
-	word = 0;
-	while (input[i])
+	c = 0;
+	while (str[i])
 	{
-		while (input[i] == ' ' || input[i] == '\t')
-			i++;
-		if (is_operator(input[i]))
+		if (str[i] && (str[i] == '"' || str[i] == '\''))
 		{
-			if (input[i + 1] == input[i])
-				i++;
-			i++;
-			word++;
+			if (!c)
+				c = str[i];
+			else if (c == str[i])
+				c = 0;
 		}
+		i++;
+	}
+	if (!c)
+		return (1);
+	return (0);
+}
+
+static void	tokenize_input(char *str, t_tokens **head, t_minishell *id)
+{
+	int	i;
+	int	j;
+	int	ctl;
+
+	i = 0;
+	ctl = 0;
+	while (str[i])
+	{
+		while (str[i] && screen_space(str[i]))
+			i++;
+		j = i;
+		if (!str[i])
+			break ;
+		else if (is_operator(str[i], 0))
+			add_node(head, extract_operator(str, &i), &ctl, 0);
 		else
 		{
-			while (input[i] && !is_operator(input[i]) && input[i] != ' ')
-				i++;
-			word++;
+			while (str[j] && !is_operator(str[j], 1) && !screen_space(str[i]))
+				j++;
+			if (str[j] == '\'' || str[j] == '"')
+				add_node(head, extrack_token(id, str, &i, i), &ctl, 1);
+			else
+				add_node(head, extrack_token(id, str, &i, i), &ctl, 0);
 		}
 	}
-	return (word);
 }
-
-int	get_token_len(const char *input)
-{
-    int i;
-
-    i = 0;
-    if (is_operator(input[i]))
-    {
-        if (input[i + 1] == input[i])
-            return 2;
-        return 1;
-    }
-    while (input[i] && !is_operator(input[i]) && input[i] != ' ' && input[i] != '\t')
-        i++;
-    return (i);
-}
-
-void	tokenize_input(char *input, t_tokens **head, t_minishell *id)
-{
-    int i;
-    int		ctl;
-
-    i = 0;
-    ctl = 0;
-    while (input[i])
-    {
-        while (input[i] == ' ' || input[i] == '\t')
-            i++;
-        if (!input[i])
-            break;
-        if (input[i] == '\'' || input[i] == '"')
-            add_node(head, extract_quoted_string(input, &i), &ctl);
-        else if (is_operator(input[i]))
-            add_node(head, extract_operator(input, &i), &ctl);
-        else if (input[i] == '$')
-            add_node(head, expand_variable(input, &i, id), &ctl);
-        else
-            add_node(head, extract_regular_token(input, &i), &ctl);
-    }
-}
-
 
 t_tokens	*check_parser(char *input, t_minishell *id)
 {
-    t_tokens *head = NULL;
-    tokenize_input(input, &head, id);
-    return head;
+	t_tokens	*head;
+
+	head = NULL;
+	if (!check_quote_pairing(input))
+	{
+		ft_put_error("The quotes not in pair", NULL, NOT_EXIT, W_TITLE);
+		return (NULL);
+	}
+	else
+		tokenize_input(input, &head, id);
+	return (head);
 }

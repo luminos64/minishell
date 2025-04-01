@@ -6,105 +6,115 @@
 /*   By: usoontra <usoontra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/01 12:36:57 by euniceleow        #+#    #+#             */
-/*   Updated: 2025/02/20 20:59:20 by usoontra         ###   ########.fr       */
+/*   Updated: 2025/03/10 20:12:20 by usoontra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-// char *extract_quoted_string(const char *input, int *index)
-// {
-// 	char	quote;
-// 	int		len;
-// 	int		start;
-// 	char	*temp;
-
-// 	quote = input[*index];
-// 	(*index)++;
-// 	start = *index;
-// 	while (input[*index] && input[*index] != quote)
-// 		(*index)++;
-// 	len = *index - start;
-// 	temp = ft_strncpy(&input[start], len);
-// 	if (input[*index] == quote)
-// 		(*index)++;
-// 	return (temp);
-// }
-
-char	*extract_quoted_string(const char *input, int *index)
+char	*ft_strncpy(const char *src, int len)
 {
-	char	quote;
-	int		len;
-	int		start;
-	int		last_quote_index;
-	char	*temp;
+	int		i;
+	char	*dest;
 
-	quote = input[*index];
-	(*index)++;
-	start = *index;
-	last_quote_index = start;
-	while (input[last_quote_index] != '\0')
+	i = 0;
+	if (!len)
+		return (NULL);
+	dest = NULL;
+	dest = malloc(sizeof(char) * (len + 1));
+	if (!dest)
+		return (NULL);
+	while (i < len && src[i])
 	{
-		if (input[last_quote_index] == quote)
-			break;
-		last_quote_index++;
+		dest[i] = src[i];
+		i++;
 	}
-	if (input[last_quote_index] == quote)
-	{
-		len = last_quote_index - start;
-		temp = ft_strncpy(&input[start], len);
-		*index = last_quote_index + 1;
-	}
-	else
-		temp = NULL;
-	return temp;
+	dest[i] = '\0';
+	return (dest);
 }
 
-char	*extract_operator(const char *input, int *index)
+static int	get_env_find(char *var_name, t_env *temp, int var_len)
 {
-	int		len;
-	char	*temp;
+	int	len;
 
-	len = 1;
+	len = ft_strlen(temp->name);
+	if (temp->name[ft_strlen(temp->name) - 1] == '=')
+		len--;
+	if (var_len > len)
+		len = var_len;
+	if (!ft_strncmp(var_name, temp->name, len) && temp->status > -1)
+		return (EXIT_SUCCESS);
+	return (EXIT_FAILURE);
+}
+
+char	*get_env_value(t_minishell *id, const char *var_name)
+{
+	t_env	*temp;
+	char	*str;
+	char	*i;
+	int		var_len;
+
+	if (!ft_strncmp(var_name, "?", 1))
+	{
+		i = ft_itoa(id->exit_status);
+		str = ft_strjoin(i, var_name + 1);
+		free(i);
+		if (!str)
+			return (NULL);
+		return (str);
+	}
+	temp = id->env;
+	var_len = ft_strlen(var_name);
+	if (var_name[ft_strlen(var_name) - 1] == '=')
+		var_len--;
+	while (temp)
+	{
+		if (!get_env_find((char *)var_name, temp, var_len))
+			return (ft_strdup(temp->value));
+		temp = temp->next;
+	}
+	return (NULL);
+}
+
+static char	*token_2_home(t_minishell *id, char *str, int start, char *temp)
+{
+	char	*res;
+
+	if (!temp)
+		return (NULL);
+	res = NULL;
+	if (str[start] == '~' && (str[start + 1] == '/' || \
+			str[start + 1] == ' ' || str[start + 1] == '\0'))
+	{
+		res = ft_strjoin3_a(NULL, get_env_value(id, "ZDOTDIR"), \
+			ft_strdup(temp + 1));
+	}
+	else
+		res = ft_strdup(temp);
+	free(temp);
+	return (res);
+}
+
+char	*extrack_token(t_minishell *id, char *str, int *len, int i)
+{
+	char	*temp;
+	char	*res;
+	int		start;
+	int		no_quote;
+
 	temp = NULL;
-	if (input[*index + 1] == input[*index])
-		len++;
-	temp = ft_strncpy(&input[*index], len);
-	*index += len;
-	return (temp);
-}
-
-char	*extract_regular_token(const char *input, int *index)
-{
-	int		len;
-	int		start;
-	char	*temp;
-
-	start = *index;
-	while (input[*index] && !is_operator(input[*index]) && input[*index] != '$'
-			&& input[*index] != ' ')
-			(*index)++;
-	len = *index - start;
-	temp = ft_strncpy(&input[start], len);
-	return (temp);
-}
-
-char	*expand_variable(const char *input, int *index, t_minishell *id)
-{
-	int		start;
-	int		len;
-	char	*temp;
-	char	*value;
-
-	(*index)++;
-	start = *index;
-	while (input[*index] && !is_operator(input[*index]) && input[*index] != ' ')
-		(*index)++;
-	len = *index - start;
-	temp = ft_strncpy(&input[start], len);
-	value = get_env_value(id, temp);
-	if (value)
-		return (value);
+	no_quote = 0;
+	start = i;
+	while (str[i] && !screen_space(str[i]) && !is_operator(str[i], 1))
+		i++;
+	if (str[i] == '\'' || str[i] == '"')
+		no_quote++;
+	temp = ft_expand_line(ft_strncpy(str + start, i - start), id, temp);
+	res = NULL;
+	if (no_quote)
+		res = ft_qoute_screen(id, str, &i, temp);
 	else
-		return ft_strdup("");
+		res = token_2_home(id, str, start, temp);
+	*len = i;
+	return (res);
 }

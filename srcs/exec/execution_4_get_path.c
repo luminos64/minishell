@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_path.c                                         :+:      :+:    :+:   */
+/*   execution_4_get_path.c                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: usoontra <usoontra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/22 00:51:05 by usoontra          #+#    #+#             */
-/*   Updated: 2025/02/18 21:08:26 by usoontra         ###   ########.fr       */
+/*   Updated: 2025/04/01 19:55:49 by usoontra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,7 +80,7 @@ static char	**ft_split_path(char *str, char c)
 	return (res);
 }
 
-static char	*get_path_2_join(char **all_path, char **cmd)
+static char	*get_path_2_join(char **all_path, char *cmd)
 {
 	char	*path;
 	int		i;
@@ -89,34 +89,31 @@ static char	*get_path_2_join(char **all_path, char **cmd)
 	i = 0;
 	while (all_path[i])
 	{
-		path = ft_strjoin(all_path[i], *cmd);
+		path = ft_strjoin(all_path[i], cmd);
 		if (!path)
-			return (*cmd);
+			return (cmd);
 		if (!access(path, F_OK))
 		{
 			ft_free_split(all_path);
-			return (path);
+			if (!access(path, X_OK))
+				return (path);
+			ft_put_error(NO_PER, path, N_PERMIT, W_TITLE);
 		}
 		free(path);
 		i++;
 	}
 	ft_free_split(all_path);
-	return (*cmd);
+	return (cmd);
 }
 
-char	*get_path(t_env *env, char **cmd)
+char	*get_path(t_env *env, char *cmd)
 {
 	t_env	*temp;
 	char	**all_path;
 	char	*path;
 
-	if (ft_strchr(*cmd, '/'))
-	{
-		if (!access(*cmd, F_OK))
-			return (*cmd);
-		else
-			ft_put_error(NO_FILE, *cmd, N_FOUND, W_TITLE);
-	}
+	if (ft_strchr(cmd, '/'))
+		return (check_path(cmd));
 	temp = env;
 	while (temp)
 	{
@@ -124,11 +121,11 @@ char	*get_path(t_env *env, char **cmd)
 		{
 			all_path = ft_split_path(temp->value, ':');
 			if (!all_path)
-				return (*cmd);
+				return (cmd);
 			path = get_path_2_join(all_path, cmd);
 			return (path);
 		}
 		temp = temp->next;
 	}
-	return (*cmd);
+	return (cmd);
 }

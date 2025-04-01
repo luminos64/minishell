@@ -6,7 +6,7 @@
 /*   By: usoontra <usoontra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/26 15:18:58 by usoontra          #+#    #+#             */
-/*   Updated: 2024/08/29 14:09:00 by usoontra         ###   ########.fr       */
+/*   Updated: 2025/03/20 19:27:16 by usoontra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ size_t	ft_strlen(const char *s)
 	size_t	i;
 
 	i = 0;
-	while (s[i] != '\0')
+	while (s && s[i] != '\0')
 	{
 		i++;
 	}

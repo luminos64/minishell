@@ -6,7 +6,7 @@
 /*   By: usoontra <usoontra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/13 20:28:56 by usoontra          #+#    #+#             */
-/*   Updated: 2025/02/17 22:21:38 by usoontra         ###   ########.fr       */
+/*   Updated: 2025/03/10 19:19:07 by usoontra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,31 +22,20 @@ static void	print_error_fd(t_tokens *list)
 		ft_putstr_fd("'\n", STDERR_FILENO);
 	}
 	else
+	{
 		ft_putstr_fd("newline", STDERR_FILENO);
+		ft_putstr_fd("'\n", STDERR_FILENO);
+	}
 }
 
-static int	add_fd_out(t_isredirect **fd, int pipe_no, t_tokens *list)
+static int	add_fd(t_redirect **fd, int pipe_no, t_tokens *list, int type)
 {
-	int				type;
-	t_isredirect	*temp;
+	t_redirect	*temp;
 
-	type = 0;
-	if (!ft_strncmp(list->str, "<", 1))
-		return (EXIT_SUCCESS);
-	if (!ft_strncmp(list->str, ">>", 3))
-		type = OUT_APPEND;
-	else if (!ft_strncmp(list->str, ">", 2))
-		type = OUT_TRUNC;
-	list = list->next;
-	if (!list || list->status != REDIRECT_NAME)
-	{
-		print_error_fd(list);
-		return (EXIT_FAILURE);
-	}
-	temp = malloc(sizeof(t_isredirect));
+	temp = malloc(sizeof(t_redirect));
 	if (!temp)
 		return (EXIT_FAILURE);
-	temp->name = list->str;
+	temp->name = ft_strdup(list->str);
 	temp->type = type;
 	temp->index = pipe_no;
 	temp->next = NULL;
@@ -54,14 +43,15 @@ static int	add_fd_out(t_isredirect **fd, int pipe_no, t_tokens *list)
 	return (EXIT_SUCCESS);
 }
 
-static int	add_fd_in(t_isredirect **fd, int pipe_no, t_tokens *list)
+static int	ft_redirect_2(t_redirect **fd, int pipe_no, t_tokens *list)
 {
 	int				type;
-	t_isredirect	*temp;
 
 	type = 0;
-	if (!ft_strncmp(list->str, ">", 1))
-		return (EXIT_SUCCESS);
+	if (!ft_strncmp(list->str, ">>", 3))
+		type = OUT_APPEND;
+	else if (!ft_strncmp(list->str, ">", 1))
+		type = OUT_TRUNC;
 	else if (!ft_strncmp(list->str, "<<", 3))
 		type = HERE_DOC;
 	else if (!ft_strncmp(list->str, "<", 2))
@@ -72,48 +62,19 @@ static int	add_fd_in(t_isredirect **fd, int pipe_no, t_tokens *list)
 		print_error_fd(list);
 		return (EXIT_FAILURE);
 	}
-	temp = malloc(sizeof(t_isredirect));
-	if (!temp)
-		return (EXIT_FAILURE);
-	temp->name = list->str;
-	temp->type = type;
-	temp->index = pipe_no;
-	temp->next = NULL;
-	ft_list_addback((void **)fd, temp);
-	return (EXIT_SUCCESS);
-}
-
-static int	ft_redirect_2(t_fds **fd, int pipe_no, t_tokens *list)
-{
-	int	error_status;
-
-	error_status = EXIT_SUCCESS;
-	if (add_fd_in(&(*fd)->in, pipe_no, list))
-		error_status = EXIT_FAILURE;
-	if (add_fd_out(&(*fd)->out, pipe_no, list))
-		error_status = EXIT_FAILURE;
-	if (error_status)
+	if (add_fd(fd, pipe_no, list, type))
 	{
-		ft_free_list((*fd)->in);
-		ft_free_list((*fd)->out);
-		free(*fd);
-		fd = NULL;
+		ft_put_error(WARNING_MEM, "fd: ", NOT_EXIT, W_TITLE);
 		return (EXIT_FAILURE);
 	}
 	return (EXIT_SUCCESS);
 }
 
-int	ft_redirect(t_fds **fd, t_tokens *list)
+int	ft_redirect(t_redirect **fd, t_tokens *list)
 {
 	t_tokens	*temp;
 	int			pipe_no;
 
-	*fd = NULL;
-	*fd = malloc(sizeof(t_fds));
-	if (!*fd)
-		return (EXIT_FAILURE);
-	(*fd)->in = NULL;
-	(*fd)->out = NULL;
 	temp = list;
 	pipe_no = 1;
 	while (temp)

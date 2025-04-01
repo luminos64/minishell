@@ -6,7 +6,7 @@
 /*   By: usoontra <usoontra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 19:36:42 by usoontra          #+#    #+#             */
-/*   Updated: 2025/02/19 00:24:43 by usoontra         ###   ########.fr       */
+/*   Updated: 2025/03/31 21:48:03 by usoontra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,7 @@ static int	add_env(t_env **env, char *envp)
 	temp = malloc(sizeof(t_env));
 	if (temp)
 	{
-		temp->name = malloc(sizeof(char) * len_name + 2);
+		temp->name = malloc(sizeof(char) * (len_name + 2));
 		temp->value = malloc(sizeof(char) * ((len - len_name) + 1));
 		temp->next = NULL;
 	}
@@ -69,10 +69,27 @@ static int	add_env(t_env **env, char *envp)
 	return (EXIT_SUCCESS);
 }
 
-static void	ft_adj_shlvl(t_minishell *id)
+static void	ft_init_id(t_minishell *id)
 {
-	int	n;
+	t_env	*temp;
+	int		n;
 
+	temp = id->env;
+	while (temp)
+	{
+		if (!ft_strncmp(temp->name, "HOME=", 6))
+			id->home = temp;
+		else if (!ft_strncmp(temp->name, "USER=", 8))
+			id->user = temp;
+		else if (!ft_strncmp(temp->name, "PWD=", 5))
+			id->pwd = temp;
+		else if (!ft_strncmp(temp->name, "OLDPWD=", 8))
+			id->old_pwd = temp;
+		else if (!ft_strncmp(temp->name, "SHLVL=", 7))
+			id->shellvl = temp;
+		temp = temp->next;
+	}
+	n = 0;
 	n = ft_atoi(id->shellvl->value);
 	free(id->shellvl->value);
 	id->shellvl->value = ft_itoa(n + 1);
@@ -80,7 +97,6 @@ static void	ft_adj_shlvl(t_minishell *id)
 
 int	ft_getenv(t_minishell *id, t_env **env, char **envp)
 {
-	t_env	*temp;
 	int		i;
 
 	*env = NULL;
@@ -91,34 +107,21 @@ int	ft_getenv(t_minishell *id, t_env **env, char **envp)
 			return (EXIT_FAILURE);
 		i++;
 	}
-	temp = *env;
-	while (temp)
-	{
-		if (!ft_strncmp(temp->name, "SHLVL=", 7))
-			id->shellvl = temp;
-		else if (!ft_strncmp(temp->name, "PWD=", 5))
-			id->pwd = temp;
-		else if (!ft_strncmp(temp->name, "OLDPWD=", 8))
-			id->old_pwd = temp;
-		temp = temp->next;
-	}
-	ft_adj_shlvl(id);
+	ft_init_id(id);
 	return (EXIT_SUCCESS);
 }
 
-void	ft_print_env(t_env *env)
+void	ft_print_env(t_env *env, char **cmd)
 {
 	t_env	*temp;
-	int		i; ////////////////////////
 
+	if (cmd[1])
+		return ;
 	temp = env;
-	i = 1;
 	while (temp)
 	{
 		if (temp->status > PRINT_EX)
-			printf("%2d %s%s\n", i, temp->name, temp->value);
+			printf("%s%s\n", temp->name, temp->value);
 		temp = temp->next;
-		i++;
 	}
 }
-

@@ -6,21 +6,25 @@
 /*   By: usoontra <usoontra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/05 12:26:33 by usoontra          #+#    #+#             */
-/*   Updated: 2024/09/09 13:55:42 by usoontra         ###   ########.fr       */
+/*   Updated: 2025/03/20 19:26:46 by usoontra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-void	ft_putstr_fd(char *s, int fd)
+int	ft_putstr_fd(char *s, int fd)
 {
+	int	i;
+
+	i = 0;
 	if (!s || fd < 0)
-		return ;
-	while (*s)
+		return (i);
+	while (s[i])
 	{
-		write(fd, s, 1);
-		s++;
+		write(fd, &s[i], 1);
+		i++;
 	}
+	return (i);
 }
 
 // int	main(void)

@@ -61,8 +61,8 @@ $(NAME):	$(OFILE)
 	ar -rcs $(NAME) $(OFILE)
 	@echo "\033[0;36mLibft Compiled\n\033[0m"
 
-${OBJ_DIR}/%.o: %.c
-	@mkdir -p ${dir $@}
+$(OFILE):	${OBJ_DIR}/%.o: %.c Makefile libft.h
+	@mkdir -p ${OBJ_DIR}
 	$(CC) $(CFLAG) -I $(HEADER) -c $< -o $@
 
 clean:

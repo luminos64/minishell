@@ -6,7 +6,7 @@
 /*   By: usoontra <usoontra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 23:59:47 by usoontra          #+#    #+#             */
-/*   Updated: 2025/02/20 20:51:25 by usoontra         ###   ########.fr       */
+/*   Updated: 2025/03/20 22:43:16 by usoontra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,11 +60,19 @@ static void	ft_addindex(t_env *env, int len)
 	}
 }
 
+static void	ft_print_export_2_print(t_env *env)
+{
+	if (env->status == PRINT_EX)
+		printf("declare -x %s\n", env->name);
+	else if (env->status == PRINT_EX_ENV)
+		printf("declare -x %s\"%s\"\n", env->name, env->value);
+}
+
 void	ft_print_export(t_env *env)
 {
 	t_env	*temp;
 	int		len;
-	int		i; //////////////////////////////
+	int		i;
 
 	len = ft_list_count(env);
 	ft_addindex(env, len);
@@ -77,13 +85,7 @@ void	ft_print_export(t_env *env)
 			if (temp->print_index == i)
 			{
 				if (temp->status > CMD && temp->status < REDIRECT)
-				{
-					// if(temp->status ==  PRINT_EX && temp->value == NULL)
-					if(temp->status ==  PRINT_EX)
-						printf("%2d declare -x %s\n", i, temp->name);
-					else if (temp->status ==  PRINT_EX_ENV)
-						printf("%2d declare -x %s\"%s\"\n", i, temp->name, temp->value);
-				}
+					ft_print_export_2_print(temp);
 				i++;
 				temp->print_index = NOT_ASSIGN;
 				break ;

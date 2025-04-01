@@ -6,11 +6,23 @@
 /*   By: usoontra <usoontra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 19:40:02 by usoontra          #+#    #+#             */
-/*   Updated: 2025/02/17 22:01:54 by usoontra         ###   ########.fr       */
+/*   Updated: 2025/04/01 20:04:59 by usoontra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+
+int	ft_strlen_char(char *str, char c)
+{
+	int	i;
+
+	i = 0;
+	if (!str)
+		return (0);
+	while (str[i] && str[i] != c)
+		i++;
+	return (i);
+}
 
 void	ft_list_addback(void **list, void *new)
 {
@@ -44,11 +56,11 @@ int	ft_list_count(void *list)
 
 void	ft_print_list(void *list, char *str, int ctl)
 {
-	t_isredirect	*temp;
-	int				i;
+	t_redirect	*temp;
+	int			i;
 
 	i = 1;
-	temp = (t_isredirect *)list;
+	temp = (t_redirect *)list;
 	printf("===========	%s: print list		===========\n", str);
 	while (temp)
 	{
@@ -63,17 +75,23 @@ void	ft_print_list(void *list, char *str, int ctl)
 	printf("====================================================\n");
 }
 
-void	ft_free_list(void *list)
+void	ft_print_cmd(t_iscmd *cmd, char *str)
 {
-	t_tokens	*temp;
-	t_tokens	*temp2;
+	t_iscmd	*temp;
+	int		i;
 
-	temp = (t_tokens *)list;
+	temp = cmd;
+	printf("===========	%s: print cmd		===========\n", str);
 	while (temp)
 	{
-		temp2 = temp->next;
-		free(temp);
-		temp = temp2;
+		i = 0;
+		printf("======	cmd index %d	======================\n", temp->index);
+		while (temp->cmd[i])
+		{
+			printf("cmd = %s\n", temp->cmd[i]);
+			i++;
+		}
+		temp = temp->next;
 	}
-	list = NULL;
+	printf("====================================================\n");
 }

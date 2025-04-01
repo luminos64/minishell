@@ -6,7 +6,7 @@
 /*   By: usoontra <usoontra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/21 20:37:51 by usoontra          #+#    #+#             */
-/*   Updated: 2025/02/19 00:54:30 by usoontra         ###   ########.fr       */
+/*   Updated: 2025/03/30 22:16:36 by usoontra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,6 +103,8 @@ static int	add_cmd_1(t_iscmd **cmd, int pipe_no, t_tokens *list)
 		free(temp);
 		return (EXIT_FAILURE);
 	}
+	temp->pid = 0;
+	temp->status = 0;
 	ft_list_addback((void **)cmd, temp);
 	return (EXIT_SUCCESS);
 }
