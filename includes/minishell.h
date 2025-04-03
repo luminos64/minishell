@@ -161,7 +161,7 @@ int			ft_redirect(t_redirect **fd, t_tokens *list);
 
 // utils/signal_handle
 void		check_signal_line(long long *ctl);
-void		check_signal_heredoc(char *name);
+void		check_signal_heredoc(char *name, int fd);
 void		sig_handle_heredoc(int sig_no);
 void		sig_handle_exec(int sig_no);
 void		sig_handle_line(int sig_no);

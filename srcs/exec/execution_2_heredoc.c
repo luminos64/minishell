@@ -6,7 +6,7 @@
 /*   By: usoontra <usoontra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 00:14:19 by usoontra          #+#    #+#             */
-/*   Updated: 2025/04/01 02:13:19 by usoontra         ###   ########.fr       */
+/*   Updated: 2025/04/03 19:31:18 by usoontra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,7 +79,7 @@ static void	heredoc_2_get_line(char *eof, char *name, t_minishell *id)
 	fd = open(name, O_WRONLY | O_CREAT | O_TRUNC, X_PERMIT);
 	if (fd < 0)
 		exit (EXIT_FAILURE);
-	check_signal_heredoc(name);
+	check_signal_heredoc(name, fd);
 	while (1)
 	{
 		line = readline("\033[0;32m>> \033[0m");
