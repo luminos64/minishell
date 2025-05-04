@@ -75,7 +75,6 @@ void	get_input(t_minishell *id)
 	{
 		str = get_prompt(len_pwd_prompt(id), id);
 		line = readline(str);
-		// line = readline("$$ ");
 		free(str);
 		if (!line)
 		{

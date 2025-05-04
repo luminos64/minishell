@@ -6,7 +6,7 @@
 /*   By: usoontra <usoontra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 01:42:40 by usoontra          #+#    #+#             */
-/*   Updated: 2025/04/01 02:10:56 by usoontra         ###   ########.fr       */
+/*   Updated: 2025/05/04 18:31:22 by usoontra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ static int	expand_3_getval(t_minishell *id, char *str, char **head, int len)
 	temp = NULL;
 	start = len;
 	while (str[len] && (str[len + 1] != '\0' && str[len + 1] != ' ' && \
-			str[len + 1] != '$' && str[len + 1] != '\'' && str[len + 1] != '/'))
+str[len + 1] != '$' && str[len + 1] != '\'' && str[len + 1] != '/'))
 		len++;
 	if (len == start)
 		return (len);

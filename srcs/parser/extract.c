@@ -84,10 +84,10 @@ static char	*token_2_home(t_minishell *id, char *str, int start, char *temp)
 		return (NULL);
 	res = NULL;
 	if (str[start] == '~' && (str[start + 1] == '/' || \
-			str[start + 1] == ' ' || str[start + 1] == '\0'))
+str[start + 1] == ' ' || str[start + 1] == '\0'))
 	{
 		res = ft_strjoin3_a(NULL, get_env_value(id, "ZDOTDIR"), \
-			ft_strdup(temp + 1));
+ft_strdup(temp + 1));
 	}
 	else
 		res = ft_strdup(temp);

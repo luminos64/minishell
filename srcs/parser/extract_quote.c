@@ -6,7 +6,7 @@
 /*   By: usoontra <usoontra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/28 04:40:10 by usoontra          #+#    #+#             */
-/*   Updated: 2025/04/01 02:11:25 by usoontra         ###   ########.fr       */
+/*   Updated: 2025/05/04 18:32:30 by usoontra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,7 +113,7 @@ char	*ft_qoute_screen(t_minishell *id, char *str, int *i, char *head)
 		while (str[*i] && str[*i] != ' ' && !is_operator(str[*i], 1))
 			(*i)++;
 		temp = ft_quote_join_head(temp, \
-			ft_expand_line(ft_strncpy(str + start, *i - start), id, temp));
+ft_expand_line(ft_strncpy(str + start, *i - start), id, temp));
 	}
 	if (!ft_strncmp(head, "$", 2))
 	{

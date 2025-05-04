@@ -6,7 +6,7 @@
 /*   By: usoontra <usoontra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/01 12:36:28 by euniceleow        #+#    #+#             */
-/*   Updated: 2025/04/01 20:40:54 by usoontra         ###   ########.fr       */
+/*   Updated: 2025/05/04 18:32:17 by usoontra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,7 @@ void	add_node(t_tokens **list, char *token, int *ctl, int quote)
 	temp->next = NULL;
 	temp->status = define_status(temp->str, *ctl, quote);
 	if (!check_status_isredirect(list) && \
-			temp->status != REDIRECT && temp->status != PIPE)
+temp->status != REDIRECT && temp->status != PIPE)
 		temp->status = REDIRECT_NAME;
 	if (temp->status == CMD)
 		(*ctl)++;

@@ -6,7 +6,7 @@
 /*   By: usoontra <usoontra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/17 12:16:12 by usoontra          #+#    #+#             */
-/*   Updated: 2025/04/01 19:25:31 by usoontra         ###   ########.fr       */
+/*   Updated: 2025/05/04 18:32:50 by usoontra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ static int	ft_isdigit_str(char *str)
 
 	i = 0;
 	while (str[i] && ((str[i] >= '0' && str[i] <= '9') || \
-		str[i] == '-' || str[i] == '+'))
+str[i] == '-' || str[i] == '+'))
 		i++;
 	if (str[i])
 		return (EXIT_FAILURE);
